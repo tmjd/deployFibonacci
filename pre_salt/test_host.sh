@@ -55,7 +55,7 @@ else
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path?n=-0 2>&1)"
-if [ $? -ne 0 -o "$result" == "[]" ]; then
+if [ $? -ne 0 -o "$result" != "[]" ]; then
     echo "ERROR n=-0 should be successful: $result"
     exit 1
 fi
