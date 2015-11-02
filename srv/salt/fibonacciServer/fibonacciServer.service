@@ -1,0 +1,12 @@
+[Unit]
+Description=Fibonacci Web Service
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/fibonacciServer
+Type=simple
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
