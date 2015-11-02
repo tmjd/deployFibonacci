@@ -20,40 +20,48 @@ curl_opts='--fail --silent --show-error'
 
 result="$(curl $curl_opts --data n=10 http://$host:$port/$path 2>&1)"
 if [ "$result" != "[0,1,1,2,3,5,8,13,21,34]" ]; then
-    echo "ERROR n=10 did not have correct output with POST method"
+    echo "ERROR n=10 did not have correct output with POST method: $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts --form n=8 http://$host:$port/$path 2>&1)"
 if [ "$result" != "[0,1,1,2,3,5,8,13]" ]; then
-    echo "ERROR n=8 did not have correct output with POST method as form"
+    echo "ERROR n=8 did not have correct output with POST method as form: $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path?n=20 2>&1)"
 if [ "$result" != "[0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181]" ]; then
-    echo "ERROR n=20 did not have correct output with GET method"
+    echo "ERROR n=20 did not have correct output with GET method: $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path?n=0 2>&1)"
 if [ "$result" != "[]" ]; then
-    echo "ERROR n=0 did not have correct output with GET method"
+    echo "ERROR n=0 did not have correct output with GET method: $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path?n=-3 2>&1)"
 if [ $? -eq 0 ]; then
-    echo "ERROR n=-3 did not have correct output from negative"
+    echo "ERROR n=-3 did not have correct output from negative: $result"
+    exit 1
 fi
 if [[ $result =~ 400 ]]; then
     /bin/true
 else
     echo "ERROR Code from n=-3 was not a 400. $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path?n=-0 2>&1)"
-if [ $? -ne 0 -a "$result" == "[]" ]; then
-    echo "ERROR n=-0 should be successful"
+if [ $? -ne 0 -o "$result" == "[]" ]; then
+    echo "ERROR n=-0 should be successful: $result"
+    exit 1
 fi
 
 result="$(curl $curl_opts http://$host:$port/$path/nothing?n=4 2>&1)"
-if [ $? -ne 0 -a "$result" == "[0,1,1,2]" ]; then
+if [ $? -eq 0 -o "$result" == "[0,1,1,2]" ]; then
     echo "ERROR with additional url path expect failure"
+    exit 1
 fi

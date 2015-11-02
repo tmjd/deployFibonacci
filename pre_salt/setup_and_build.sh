@@ -2,7 +2,7 @@
 
 cd "$(dirname $0)"
 
-apt-get install --yes git golang
+apt-get install --yes git golang curl
 
 rm -rf build
 mkdir build
@@ -38,30 +38,35 @@ fi
 
 cp bin/fibonacciServer /srv/salt/fibonacciServer/fibonacciServer
 
-./bin/fibonacciServer &
+cd ..
+./build/bin/fibonacciServer &
 bash test_host.sh localhost 8080 fibonacci
 if [ $? -ne 0 ]; then
     echo "Error: test_host.h localhost 8080 fibonacci"
+    exit 1
 fi
 killall fibonacciServer
 
-./bin/fibonacciServer --serve_path rest &
+./build/bin/fibonacciServer --serve_path rest &
 bash test_host.sh localhost 8080 rest
 if [ $? -ne 0 ]; then
     echo "Error: test_host.sh localhost 8080 rest"
+    exit 1
 fi
 killall fibonacciServer
 
-./bin/fibonacciServer --serve_path rest --port 80 &
+./build/bin/fibonacciServer --serve_path rest --port 80 &
 bash test_host.sh localhost 80 rest
 if [ $? -ne 0 ]; then
     echo "Error: test_host.sh localhost 80 rest"
+    exit 1
 fi
 killall fibonacciServer
 
-./bin/fibonacciServer --port 80 &
+./build/bin/fibonacciServer --port 80 &
 bash test_host.sh localhost 80 fibonacci
 if [ $? -ne 0 ]; then
     echo "Error: test_host.sh localhost 80 fibonacci"
+    exit 1
 fi
 killall fibonacciServer
